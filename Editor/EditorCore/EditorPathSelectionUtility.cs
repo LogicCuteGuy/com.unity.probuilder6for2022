@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
 using UnityEngine.ProBuilder;
+using ToolManager = UnityEditor.EditorTools.ToolManager;
 
 namespace UnityEditor.ProBuilder
 {
@@ -55,9 +56,12 @@ namespace UnityEditor.ProBuilder
             return true;
         }
 
-        [Shortcut("ProBuilder/Selection/Select Path", typeof(PositionToolContext.ProBuilderShortcutContext), KeyCode.Mouse0, ShortcutModifiers.Shift | ShortcutModifiers.Action)]
+        [Shortcut("ProBuilder/Selection/Select Path", typeof(SceneView), KeyCode.Mouse0, ShortcutModifiers.Shift | ShortcutModifiers.Action)]
         static void DoPathSelection(ShortcutArguments args)
         {
+            if (ToolManager.activeContextType != typeof(PositionToolContext))
+                return;
+
             var mesh = EditorSceneViewPicker.selection?.mesh;
             if (mesh == null || ProBuilderEditor.selectMode != SelectMode.Face)
                 return;

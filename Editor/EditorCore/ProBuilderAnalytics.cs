@@ -18,12 +18,16 @@ using UnityEngine.ProBuilder;
 
 namespace UnityEditor.ProBuilder
 {
+#if UNITY_6000_0_OR_NEWER
     [AnalyticInfo(
         eventName: k_ProbuilderEventName,
         vendorKey: k_VendorKey,
         maxEventsPerHour: k_MaxEventsPerHour,
         maxNumberOfElements: k_MaxNumberOfElements)]
     class ProBuilderAnalytics : IAnalytic
+#else
+    class ProBuilderAnalytics
+#endif
     {
         const int k_MaxEventsPerHour = 1000;
         const int k_MaxNumberOfElements = 1000;
@@ -38,6 +42,7 @@ namespace UnityEditor.ProBuilder
         int m_SelectModeId;
         string m_TriggerType;
 
+    #if UNITY_6000_0_OR_NEWER
         // Data structure for Triggered Actions
         [Serializable]
         struct ProBuilderActionData : IAnalytic.IData
@@ -47,14 +52,6 @@ namespace UnityEditor.ProBuilder
             public string subLevel;
             public int subLevelId;
             public string triggeredFrom;
-        }
-
-        internal ProBuilderAnalytics(string actionName, string actionType, SelectMode mode)
-        {
-            m_ActionName = actionName;
-            m_ActionType = actionType;
-            m_SelectMode = mode.ToString();
-            m_SelectModeId = (int)mode;
         }
 
         public bool TryGatherData(out IAnalytic.IData data, out Exception error)
@@ -71,6 +68,15 @@ namespace UnityEditor.ProBuilder
             data = parameters;
             return data != null;
         }
+#endif
+
+    internal ProBuilderAnalytics(string actionName, string actionType, SelectMode mode)
+    {
+        m_ActionName = actionName;
+        m_ActionType = actionType;
+        m_SelectMode = mode.ToString();
+        m_SelectModeId = (int)mode;
+    }
 
         // This is the main call to register an action event
         public static void SendActionEvent(MenuAction mAction)
@@ -107,6 +113,7 @@ namespace UnityEditor.ProBuilder
 
             try
             {
+#if UNITY_6000_0_OR_NEWER
                 // If DONTSEND is defined, skip sending stuff to the server
                 #if !PB_ANALYTICS_DONTSEND
                 var sendResult = EditorAnalytics.SendAnalytic(data);
@@ -122,6 +129,10 @@ namespace UnityEditor.ProBuilder
                 #else
                 DumpLogInfo($"[PB] Event='{eventName}', time='{DateTime.Now:HH:mm:ss}', payload={EditorJsonUtility.ToJson(eventData, true)}");
                 #endif
+#else
+                // Unity 2022 does not expose the Unity 6 IAnalytic pipeline used by this package.
+                DumpLogInfo($"[PB] Analytics API unavailable in this Unity version. action='{actionName}', type='{actionType}'");
+#endif
             }
             catch(Exception e)
             {

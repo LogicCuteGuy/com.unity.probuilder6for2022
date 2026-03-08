@@ -10,7 +10,7 @@ namespace UnityEditor.ProBuilder
 	/// </summary>
 	static class ProBuilderEditorShortcuts
 	{
-		[Shortcut("ProBuilder/Editor/Edit Vertices", typeof(SceneViewMotion.SceneViewContext))]
+		[Shortcut("ProBuilder/Editor/Edit Vertices", typeof(SceneView))]
 		static void SetSelectMode_Vertex()
 		{
 			if (!CheckAndEnterPBContextIfNeeded())
@@ -19,7 +19,7 @@ namespace UnityEditor.ProBuilder
 			ProBuilderEditor.selectMode = SelectMode.Vertex;
 		}
 		
-		[Shortcut("ProBuilder/Editor/Edit Edges", typeof(SceneViewMotion.SceneViewContext))]
+		[Shortcut("ProBuilder/Editor/Edit Edges", typeof(SceneView))]
 		static void SetSelectMode_Edge()
 		{			
 			if (!CheckAndEnterPBContextIfNeeded())
@@ -28,7 +28,7 @@ namespace UnityEditor.ProBuilder
 			ProBuilderEditor.selectMode = SelectMode.Edge;
 		}
 		
-		[Shortcut("ProBuilder/Editor/Edit Faces", typeof(SceneViewMotion.SceneViewContext))]
+		[Shortcut("ProBuilder/Editor/Edit Faces", typeof(SceneView))]
 		static void SetSelectMode_Faces()
 		{
 			if (!CheckAndEnterPBContextIfNeeded())
@@ -37,7 +37,7 @@ namespace UnityEditor.ProBuilder
 			ProBuilderEditor.selectMode = SelectMode.Face;
 		}
 
-		[Shortcut("ProBuilder/Editor/Toggle Edit Mode", typeof(PositionToolContext.ProBuilderShortcutContext), KeyCode.H)]
+		[Shortcut("ProBuilder/Editor/Toggle Edit Mode", typeof(SceneView), KeyCode.H)]
 		static void Toggle_SelectMode()
 		{
 			if(ProBuilderEditor.instance != null)

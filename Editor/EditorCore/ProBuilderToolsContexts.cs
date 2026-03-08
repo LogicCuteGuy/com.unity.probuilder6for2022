@@ -7,10 +7,11 @@ using UnityEditor.EditorTools;
 using UnityEditor.ProBuilder.Actions;
 using UnityEditor.ProBuilder.Overlays;
 using UnityEditor.Actions;
-using UnityEditor.ShortcutManagement;
+using ToolManager = UnityEditor.EditorTools.ToolManager;
 
 namespace UnityEditor.ProBuilder
 {
+    [ExtensionOfNativeClass]
     static class ProBuilderToolManager
     {
         public static Tool activeTool => Tools.current;
@@ -20,17 +21,8 @@ namespace UnityEditor.ProBuilder
     [EditorToolContext("ProBuilder", typeof(ProBuilderMesh))]
     class PositionToolContext : EditorToolContext
     {
-        internal class ProBuilderShortcutContext : IShortcutContext
-        {
-            public bool active
-                => EditorWindow.focusedWindow is SceneView
-                   && ProBuilderEditor.instance != null;
-        }
-
         ProBuilderEditor m_Editor;
         ProBuilderEditor editor => m_Editor ??= new ProBuilderEditor();
-
-        ProBuilderShortcutContext m_ShortcutContext;
 
         SceneInformationOverlay m_SceneInfoOverlay;
 
@@ -71,14 +63,11 @@ namespace UnityEditor.ProBuilder
             typeof(Actions.ToggleXRay)
         };
 
-        public override void PopulateMenu(DropdownMenu menu)
+        public void PopulateMenu(DropdownMenu menu)
         {
             var actions = EditorToolbarLoader.GetActions();
             var group = ToolbarGroup.Tool;
 
-            ContextMenuUtility.AddMenuItem(menu, "Edit/Select All","Select/Select All");
-            ContextMenuUtility.AddMenuItem(menu, "Edit/Deselect All","Select/Deselect All");
-            ContextMenuUtility.AddMenuItem(menu, "Edit/Invert Selection","Select/Invert Selection");
             group = actions[0].group;
             // grouping and filtering is bespoke for demo reasons
             foreach (var action in actions)
@@ -102,7 +91,7 @@ namespace UnityEditor.ProBuilder
                     if (action.hasFileMenuEntry)
                     {
                         string path = EditorToolbarMenuItem.k_MenuPrefix + action.group + "/" + title;
-                        ContextMenuUtility.AddMenuItem(menu, path, GetMenuTitle(action, title));
+                        AddBuiltinMenuItem(menu, path, GetMenuTitle(action, title));
                     }
                     else if (action.optionsEnabled)
                     {
@@ -116,7 +105,31 @@ namespace UnityEditor.ProBuilder
 
             var trs = Selection.transforms;
             if (trs.GetComponents<MeshFilter>().Length > trs.GetComponents<ProBuilderMesh>().Length)
-                ContextMenuUtility.AddMenuItemsForType(menu, typeof(MeshFilter), targets, "Mesh Filter");
+                AddBuiltinMenuItemsForType(menu, typeof(MeshFilter), targets, "Mesh Filter");
+        }
+
+        static void AddBuiltinMenuItem(DropdownMenu menu, string menuPath, string displayTitle)
+        {
+            menu.AppendAction(displayTitle, _ => EditorApplication.ExecuteMenuItem(menuPath));
+        }
+
+        static void AddBuiltinMenuItemsForType(DropdownMenu menu, Type componentType, IEnumerable<UnityEngine.Object> objects, string labelPrefix)
+        {
+            var hasComponent = false;
+            foreach (var obj in objects)
+            {
+                if (obj is GameObject go && go.GetComponent(componentType) != null)
+                {
+                    hasComponent = true;
+                    break;
+                }
+            }
+
+            if (!hasComponent)
+                return;
+
+            // Keep a minimal context action on 2022 where ContextMenuUtility is unavailable.
+            menu.AppendAction($"{labelPrefix}/ProBuilderize", _ => EditorToolbarLoader.GetInstance<Actions.ProBuilderize>().PerformAction());
         }
 
         static bool HasPreview(MenuAction action)
@@ -124,7 +137,7 @@ namespace UnityEditor.ProBuilder
             return !(action is DetachFaces || action is DuplicateFaces);
         }
 
-        string GetMenuTitle(MenuAction action, string title)
+        static string GetMenuTitle(MenuAction action, string title)
         {
             // Geometry and Tool groups are not displayed in the menu
             if (action.group != ToolbarGroup.Geometry && action.group != ToolbarGroup.Tool)
@@ -144,7 +157,6 @@ namespace UnityEditor.ProBuilder
             ProBuilderSettings.instance.afterSettingsSaved += UpdateSceneInfoOverlay;
             UpdateSceneInfoOverlay();
 
-            ShortcutManager.RegisterContext(m_ShortcutContext ??= new ProBuilderShortcutContext());
         }
 
         public override void OnWillBeDeactivated()
@@ -155,7 +167,6 @@ namespace UnityEditor.ProBuilder
             if(m_SceneInfoOverlay != null)
                 SceneView.RemoveOverlayFromActiveView(m_SceneInfoOverlay);
 
-            ShortcutManager.UnregisterContext(m_ShortcutContext);
         }
 
         void UpdateSceneInfoOverlay()
@@ -177,7 +188,74 @@ namespace UnityEditor.ProBuilder
         {
             if (!(window is SceneView view))
                 return;
+
+            if (Event.current.type == EventType.ContextClick)
+            {
+                ShowContextMenuFallback();
+                Event.current.Use();
+                return;
+            }
+
             editor.OnSceneGUI(view);
+        }
+
+        internal static void ShowContextMenuFallback()
+        {
+            var menu = new GenericMenu();
+
+            var actions = EditorToolbarLoader.GetActions();
+            var group = actions[0].group;
+
+            foreach (var action in actions)
+            {
+                if (k_ContextMenuBlacklist.Contains(action.GetType()))
+                    continue;
+
+                if (action.group == ToolbarGroup.Entity || action.group == ToolbarGroup.Object || action.group == ToolbarGroup.Tool)
+                    continue;
+
+                if (action.group != group)
+                {
+                    menu.AddSeparator("");
+                    group = action.group;
+                }
+
+                var title = GetMenuTitle(action, action.menuTitle);
+
+                if (action.hidden)
+                    continue;
+
+                if (!action.enabled)
+                {
+                    menu.AddDisabledItem(new GUIContent(title));
+                    continue;
+                }
+
+                if (action.hasFileMenuEntry)
+                {
+                    var path = EditorToolbarMenuItem.k_MenuPrefix + action.group + "/" + action.menuTitle;
+                    menu.AddItem(new GUIContent(title), false, () => EditorApplication.ExecuteMenuItem(path));
+                }
+                else if (action.optionsEnabled)
+                {
+                    menu.AddItem(new GUIContent(title), false,
+                        () => EditorAction.Start(new MenuActionSettings(action, HasPreview(action))));
+                }
+                else
+                {
+                    menu.AddItem(new GUIContent(title), false, () => action.PerformAction());
+                }
+            }
+
+            var trs = Selection.transforms;
+            if (trs.GetComponents<MeshFilter>().Length > trs.GetComponents<ProBuilderMesh>().Length)
+            {
+                menu.AddSeparator("");
+                menu.AddItem(new GUIContent("Mesh Filter/ProBuilderize"), false,
+                    () => EditorToolbarLoader.GetInstance<Actions.ProBuilderize>().PerformAction());
+            }
+
+            menu.ShowAsContext();
         }
 
         // This boolean allows to call the action only once in case of multi-selection as PB actions
@@ -404,6 +482,41 @@ namespace UnityEditor.ProBuilder
                     s_ActionAlreadyTriggered = false;
                 };
             }
+        }
+    }
+
+    [EditorTool("ProBuilder Context Menu", typeof(ProBuilderMesh), typeof(PositionToolContext))]
+    class ProBuilderContextMenuTool : EditorTool
+    {
+        GUIContent m_IconContent;
+
+        public override GUIContent toolbarIcon
+        {
+            get
+            {
+                if (m_IconContent == null)
+                {
+                    var icon = EditorGUIUtility.IconContent("_Popup");
+                    m_IconContent = new GUIContent
+                    {
+                        image = icon.image,
+                        text = "ProBuilder Menu",
+                        tooltip = "Open ProBuilder context menu"
+                    };
+                }
+
+                return m_IconContent;
+            }
+        }
+
+        public override void OnActivated()
+        {
+            PositionToolContext.ShowContextMenuFallback();
+            EditorApplication.delayCall += () =>
+            {
+                if (ToolManager.activeToolType == typeof(ProBuilderContextMenuTool))
+                    ToolManager.RestorePreviousTool();
+            };
         }
     }
 

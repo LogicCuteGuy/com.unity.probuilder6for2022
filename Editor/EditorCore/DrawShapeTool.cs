@@ -11,7 +11,7 @@ using ToolManager = UnityEditor.EditorTools.ToolManager;
 namespace UnityEditor.ProBuilder
 {
 
-    [EditorTool("Create Cube", variantGroup = typeof(DrawShapeTool), variantPriority = 0)]
+    [EditorTool("Create Cube")]
     class CreateCubeTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Cube  %#K", false, PreferenceKeys.menuEditor + 1)]
@@ -55,7 +55,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Sphere",variantGroup = typeof(DrawShapeTool), variantPriority = 1)]
+    [EditorTool("Create Sphere")]
     class CreateSphereTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Sphere", false, PreferenceKeys.menuEditor + 2)]
@@ -99,7 +99,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Plane", variantGroup = typeof(DrawShapeTool), variantPriority = 2)]
+    [EditorTool("Create Plane")]
     class CreatePlaneTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Plane", false, PreferenceKeys.menuEditor + 3)]
@@ -143,7 +143,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Cylinder",variantGroup = typeof(DrawShapeTool), variantPriority = 3)]
+    [EditorTool("Create Cylinder")]
     class CreateCylinderTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Cylinder", false, PreferenceKeys.menuEditor + 4)]
@@ -187,7 +187,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Cone", variantGroup = typeof(DrawShapeTool), variantPriority = 4)]
+    [EditorTool("Create Cone")]
     class CreateConeTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Cone", false, PreferenceKeys.menuEditor + 5)]
@@ -231,7 +231,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Prism",variantGroup = typeof(DrawShapeTool), variantPriority = 5)]
+    [EditorTool("Create Prism")]
     class CreatePrismTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Prism", false, PreferenceKeys.menuEditor + 6)]
@@ -275,7 +275,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Stairs", variantGroup = typeof(DrawShapeTool), variantPriority = 6)]
+    [EditorTool("Create Stairs")]
     class CreateStairsTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Stairs", false, PreferenceKeys.menuEditor + 7)]
@@ -319,7 +319,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Torus",variantGroup = typeof(DrawShapeTool), variantPriority = 7)]
+    [EditorTool("Create Torus")]
     class CreateTorusTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Torus", false, PreferenceKeys.menuEditor + 8)]
@@ -363,7 +363,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Pipe",variantGroup = typeof(DrawShapeTool), variantPriority = 8)]
+    [EditorTool("Create Pipe")]
     class CreatePipeTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Pipe", false, PreferenceKeys.menuEditor + 9)]
@@ -407,7 +407,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Arch",variantGroup = typeof(DrawShapeTool), variantPriority = 9)]
+    [EditorTool("Create Arch")]
     class CreateArchTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Arch", false, PreferenceKeys.menuEditor + 10)]
@@ -451,7 +451,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Door",variantGroup = typeof(DrawShapeTool), variantPriority = 10)]
+    [EditorTool("Create Door")]
     class CreateDoorTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Door", false, PreferenceKeys.menuEditor + 11)]
@@ -495,7 +495,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [EditorTool("Create Sprite",variantGroup = typeof(DrawShapeTool), variantPriority = 11)]
+    [EditorTool("Create Sprite")]
     class CreateSpriteTool : DrawShapeTool
     {
         [MenuItem(EditorToolbarMenuItem.k_MenuPrefix + "Editors/Create Shape/Sprite", false, PreferenceKeys.menuEditor + 12)]

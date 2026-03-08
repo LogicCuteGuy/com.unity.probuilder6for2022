@@ -13,6 +13,7 @@ namespace UnityEditor.ProBuilder
     /// <summary>
     /// Manages the [ProBuilder toolbar and tool mode](../manual/toolbar.html).
     /// </summary>
+    [ExtensionOfNativeClass]
     public sealed class ProBuilderEditor : IDisposable
     {
         // Match the value set in RectSelection.cs
@@ -305,7 +306,6 @@ namespace UnityEditor.ProBuilder
             if (m_CurrentEvent.type == EventType.KeyDown)
             {
                 if (m_CurrentEvent.keyCode == KeyCode.Escape
-                    && EditorToolManager.activeOverride == null
                     && ToolManager.activeContextType == typeof(PositionToolContext))
                 {
                     ToolManager.SetActiveContext<GameObjectToolContext>();

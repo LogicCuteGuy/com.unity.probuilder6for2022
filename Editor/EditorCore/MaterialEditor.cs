@@ -15,14 +15,6 @@ namespace UnityEditor.ProBuilder
     /// </summary>
     sealed class MaterialEditor : ConfigurableWindow
     {
-        class MaterialShortcutContext : IShortcutContext
-        {
-            public bool active
-                => EditorWindow.focusedWindow is SceneView
-                   && instance != null && MeshSelection.selectedObjectCount > 0
-                   && instance.m_QueuedMaterial.value != null;
-        }
-
         // Reference to pb_Editor instance.
         static ProBuilderEditor editor { get { return ProBuilderEditor.instance; } }
 
@@ -43,9 +35,15 @@ namespace UnityEditor.ProBuilder
             ApplyMaterial(MeshSelection.topInternal, instance.m_QueuedMaterial.value);
         }
 
-        [Shortcut("ProBuilder/Apply Quick Material", typeof(MaterialShortcutContext), KeyCode.Mouse2, defaultShortcutModifiers: ShortcutModifiers.Shift | ShortcutModifiers.Control)]
+        [Shortcut("ProBuilder/Apply Quick Material", typeof(SceneView), KeyCode.Mouse2, defaultShortcutModifiers: ShortcutModifiers.Shift | ShortcutModifiers.Control)]
         public static void ApplyQuickMaterialShortcut()
         {
+            if (!(EditorWindow.focusedWindow is SceneView)
+                || instance == null
+                || MeshSelection.selectedObjectCount <= 0
+                || instance.m_QueuedMaterial.value == null)
+                return;
+
             ApplyMaterial(MeshSelection.topInternal, instance.m_QueuedMaterial.value);
         }
 
@@ -149,8 +147,6 @@ namespace UnityEditor.ProBuilder
         // The index of the currently loaded material palette in m_AvailablePalettes
         int m_CurrentPaletteIndex = 0;
 
-        MaterialShortcutContext m_ShortcutContext;
-
         /// <summary>
         /// The currently loaded material palette, or a default.
         /// </summary>
@@ -211,12 +207,10 @@ namespace UnityEditor.ProBuilder
             s_CurrentPalette = null;
             RefreshAvailablePalettes();
 
-            ShortcutManager.RegisterContext(m_ShortcutContext ??= new MaterialShortcutContext());
         }
 
         void OnDisable()
         {
-            ShortcutManager.UnregisterContext(m_ShortcutContext);
             instance = null;
         }
 

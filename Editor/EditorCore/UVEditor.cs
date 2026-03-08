@@ -19,14 +19,6 @@ namespace UnityEditor.ProBuilder
             get { return ProBuilderEditor.instance; }
         }
 
-
-        UVEditorShortcutContext m_ShortcutContext;
-        internal class UVEditorShortcutContext : IShortcutContext
-        {
-            public bool active => UVEditor.instance != null;
-        }
-
-
         public override void AddItemsToMenu(GenericMenu menu)
         {
             base.AddItemsToMenu(menu);
@@ -265,7 +257,6 @@ namespace UnityEditor.ProBuilder
             instance = this;
             nearestElement.Clear();
 
-            ShortcutManager.RegisterContext(m_ShortcutContext ??= new UVEditorShortcutContext());
         }
 
         void OnDisable()
@@ -286,7 +277,6 @@ namespace UnityEditor.ProBuilder
             ProBuilderMeshEditor.onGetFrameBoundsEvent -= OnGetFrameBoundsEvent;
             Undo.undoRedoPerformed -= ObjectSelectionChanged;
 
-            ShortcutManager.UnregisterContext(m_ShortcutContext);
         }
 
         /**
@@ -710,7 +700,7 @@ namespace UnityEditor.ProBuilder
             return true;
         }
 
-        [Shortcut("ProBuilder/Editor/Auto-stitch UV", typeof(UVEditorShortcutContext), KeyCode.Mouse0,
+        [Shortcut("ProBuilder/Editor/Auto-stitch UV", typeof(UVEditor), KeyCode.Mouse0,
             ShortcutModifiers.Action | ShortcutModifiers.Shift | ShortcutModifiers.Alt)]
         static void TriggerAutoStitchUV()
         {
@@ -724,7 +714,7 @@ namespace UnityEditor.ProBuilder
             }
         }
 
-        [Shortcut("ProBuilder/Editor/Copy UV Settings", typeof(UVEditorShortcutContext), KeyCode.Mouse0,
+        [Shortcut("ProBuilder/Editor/Copy UV Settings", typeof(UVEditor), KeyCode.Mouse0,
             ShortcutModifiers.Action | ShortcutModifiers.Alt)]
         static void CopyUVSettings()
         {
