@@ -1,6 +1,7 @@
 ## Table of Contents
 
 - [About](#about)
+- [How to Install](#how-to-install)
 - [Setup](#development)
 - [API Overview](#api)
 - [License](#license)
@@ -18,6 +19,42 @@ This readme provides a brief introduction for developers interested in working w
 
 Working code samples are also available from the package repository under the `Samples~` subfolder, or from the Package Manager you can import them directly into your Unity project.
 
+## How to Install
+
+You can install ProBuilder in any Unity project using one of these methods.
+
+### Option 1: Install from Package Manager (recommended)
+
+1. Open your Unity project.
+2. Go to `Window > Package Manager`.
+3. In the package source dropdown, select `Unity Registry`.
+4. Search for `ProBuilder`.
+5. Select `ProBuilder` and click `Install`.
+
+### Option 2: Install from Git URL
+
+1. Open `Window > Package Manager`.
+2. Click the `+` button.
+3. Select `Add package from git URL...`.
+4. Paste:
+
+```
+https://github.com/LogicCuteGuy/com.unity.probuilder6for2022.git
+```
+
+5. Click `Add`.
+
+### Option 3: Install from local source (for package development)
+
+Clone this repository into your Unity project's `Packages` folder:
+
+```
+~/Desktop/MyProject$ cd Packages/
+~/Desktop/MyProject/Packages$ git clone https://github.com/LogicCuteGuy/com.unity.probuilder6for2022
+```
+
+Then install it from the Package Manager as a local package (see [Package Manager local packages](https://docs.unity3d.com/Manual/upm-ui-local.html)).
+
 ## Development
 
 Unity provides ProBuilder as a package, distributed with the Package Manager.
@@ -26,7 +63,7 @@ To start working with ProBuilder source, clone the repository into your `Package
 
 ```
 ~/Desktop/MyProject$ cd Packages/
-~/Desktop/MyProject/Packages$ git clone https://github.com/Unity-Technologies/com.unity.probuilder
+~/Desktop/MyProject/Packages$ git clone https://github.com/LogicCuteGuy/com.unity.probuilder6for2022
 ```
 
 Then you can install the cloned package directly in the Package Manager using the "local" method. For more information on installing local packages in the Package Manager, see the [Package Manager](https://docs.unity3d.com/Manual/upm-ui-local.html) documentation.
