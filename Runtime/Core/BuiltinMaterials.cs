@@ -243,7 +243,7 @@ namespace UnityEngine.ProBuilder
         internal static Material GetDefaultMaterial()
         {
             var material = (Material) Resources.Load("Materials/ProBuilderDefault", typeof(Material));
-            material.shader = Shader.Find("ProBuilder6/Standard Vertex Color");
+            material.shader = Shader.Find("ProBuilder/Diffuse Texture Blend");
 
             if (material == null || !material.shader.isSupported)
                 material = GetLegacyDiffuse();
