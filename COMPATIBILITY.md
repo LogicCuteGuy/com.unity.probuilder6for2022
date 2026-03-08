@@ -10,4 +10,4 @@ Compatibility chart for ProBuilder and Unity versions.
 | 4.2                |   2019.3    | 2018.4     |
 | 4.3                |             | 2018.4     |
 | 5.2                |             | 2019.3     |
-| 6.0 (unreleased)   |             | 2023.3     |
+| 6.0.x              |             | 2022.3     |

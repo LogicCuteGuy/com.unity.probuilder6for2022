@@ -85,7 +85,7 @@ namespace UnityEditor.ProBuilder
         {
             var deltaPoint = ray.GetPoint(distance) - tool.m_BB_Origin;
             deltaPoint = Quaternion.Inverse(tool.m_PlaneRotation) * deltaPoint;
-            deltaPoint = tool.GetPoint(deltaPoint, EditorSnapSettings.snapEnabled);
+            deltaPoint = tool.GetPoint(deltaPoint, EditorSnapSettings.gridSnapEnabled);
             tool.m_BB_OppositeCorner = tool.m_PlaneRotation * deltaPoint + tool.m_BB_Origin;
             tool.m_BB_HeightCorner = tool.m_BB_OppositeCorner;
             tool.RebuildShape();

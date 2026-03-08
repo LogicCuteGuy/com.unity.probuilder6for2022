@@ -50,7 +50,7 @@ Grow by angle is enabled by Option + Clicking the <b>Grow Selection</b> button."
         public override VisualElement CreateSettingsContent()
         {
             var root = new VisualElement();
-            root.enabledSelf = enabled && ProBuilderEditor.selectMode == SelectMode.Face;
+            root.SetEnabled(enabled && ProBuilderEditor.selectMode == SelectMode.Face);
 
             var angleToggle = new Toggle("Restrict to Angle");
             angleToggle.SetValueWithoutNotify(m_GrowSelectionWithAngle);
