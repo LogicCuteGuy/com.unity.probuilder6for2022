@@ -83,4 +83,61 @@ static class SubdivideElementsTests
                 UObject.DestroyImmediate(cube.item1.gameObject);
         }
     }
+
+    [Test]
+    public static void SubdivideFace_XYOnQuad_CreatesFourFaces()
+    {
+        var pb = ShapeFactory.Instantiate<Cube>();
+
+        try
+        {
+            var face = pb.facesInternal[0];
+            var res = Subdivision.Subdivide(pb, new[] { face }, SubdivisionAxis.XY);
+
+            Assert.NotNull(res);
+            Assert.That(res.Length, Is.EqualTo(4));
+        }
+        finally
+        {
+            UObject.DestroyImmediate(pb.gameObject);
+        }
+    }
+
+    [Test]
+    public static void SubdivideFace_XOnQuad_CreatesTwoFaces()
+    {
+        var pb = ShapeFactory.Instantiate<Cube>();
+
+        try
+        {
+            var face = pb.facesInternal[0];
+            var res = Subdivision.Subdivide(pb, new[] { face }, SubdivisionAxis.X);
+
+            Assert.NotNull(res);
+            Assert.That(res.Length, Is.EqualTo(2));
+        }
+        finally
+        {
+            UObject.DestroyImmediate(pb.gameObject);
+        }
+    }
+
+    [Test]
+    public static void SubdivideFace_YOnQuad_CreatesTwoFaces()
+    {
+        var pb = ShapeFactory.Instantiate<Cube>();
+
+        try
+        {
+            var face = pb.facesInternal[0];
+            var res = Subdivision.Subdivide(pb, new[] { face }, SubdivisionAxis.Y);
+
+            Assert.NotNull(res);
+            Assert.That(res.Length, Is.EqualTo(2));
+        }
+        finally
+        {
+            UObject.DestroyImmediate(pb.gameObject);
+        }
+    }
 }
