@@ -49,7 +49,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ProBuilderDefault 1
+  m_Name: ProBuilderDefault
   m_Shader: {fileID: 4800000, guid: 911130a939bf84843bcc4211c327f579, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
