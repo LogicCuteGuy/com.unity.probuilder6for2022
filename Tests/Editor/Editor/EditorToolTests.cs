@@ -53,4 +53,17 @@ public class EditorToolTests
         ProBuilderEditor.selectMode = SelectMode.Face;
         Assert.That(ToolManager.activeToolType, Is.EqualTo(typeof(ProbuilderMoveTool)));
     }
+
+    [Test]
+    public void TextureContextUsesTextureTools()
+    {
+        ProBuilderEditor.selectMode = SelectMode.TextureFace;
+        ToolManager.SetActiveContext<TextureToolContext>();
+        Tools.current = Tool.Move;
+
+        Assert.That(ToolManager.activeToolType, Is.EqualTo(typeof(TextureMoveTool)));
+
+        ToolManager.SetActiveContext<PositionToolContext>();
+        ProBuilderEditor.selectMode = SelectMode.Face;
+    }
 }

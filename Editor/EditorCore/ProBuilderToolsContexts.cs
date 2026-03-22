@@ -520,6 +520,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
+    [EditorToolContext("ProBuilder UV", typeof(ProBuilderMesh))]
     class TextureToolContext : EditorToolContext
     {
         ProBuilderEditor m_Editor;
