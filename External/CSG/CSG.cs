@@ -43,8 +43,8 @@ namespace UnityEngine.ProBuilder.Csg
 
         public enum SolverType
         {
-            TriangleBased,
-            BSP
+            Float,
+            Exact
         }
 
         const float k_DefaultEpsilon = 0.00001f;
@@ -72,7 +72,7 @@ namespace UnityEngine.ProBuilder.Csg
         /// Performs a boolean operation on two GameObjects.
         /// </summary>
         /// <returns>A new mesh.</returns>
-        public static Model Perform(BooleanOp op, GameObject lhs, GameObject rhs, SolverType solver = SolverType.TriangleBased)
+        public static Model Perform(BooleanOp op, GameObject lhs, GameObject rhs, SolverType solver = SolverType.Exact)
         {
             switch (op)
             {
@@ -94,7 +94,7 @@ namespace UnityEngine.ProBuilder.Csg
         /// <param name="rhs">The input mesh of the boolean operation.</param>
         /// <param name="solver">The CSG solver to use.</param>
         /// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
-        public static Model Union(GameObject lhs, GameObject rhs, SolverType solver = SolverType.TriangleBased)
+        public static Model Union(GameObject lhs, GameObject rhs, SolverType solver = SolverType.Exact)
         {
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
@@ -103,7 +103,7 @@ namespace UnityEngine.ProBuilder.Csg
             List<Polygon> polygonsB = csg_model_b.ToPolygons();
 
             List<Polygon> result;
-            if (solver == SolverType.BSP)
+            if (solver == SolverType.Float)
             {
                 Node nodeA = new Node(polygonsA);
                 Node nodeB = new Node(polygonsB);
@@ -125,7 +125,7 @@ namespace UnityEngine.ProBuilder.Csg
         /// <param name="rhs">The input mesh of the boolean operation.</param>
         /// <param name="solver">The CSG solver to use.</param>
         /// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
-        public static Model Subtract(GameObject lhs, GameObject rhs, SolverType solver = SolverType.TriangleBased)
+        public static Model Subtract(GameObject lhs, GameObject rhs, SolverType solver = SolverType.Exact)
         {
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
@@ -134,7 +134,7 @@ namespace UnityEngine.ProBuilder.Csg
             List<Polygon> polygonsB = csg_model_b.ToPolygons();
 
             List<Polygon> result;
-            if (solver == SolverType.BSP)
+            if (solver == SolverType.Float)
             {
                 Node nodeA = new Node(polygonsA);
                 Node nodeB = new Node(polygonsB);
@@ -156,7 +156,7 @@ namespace UnityEngine.ProBuilder.Csg
         /// <param name="rhs">The input mesh of the boolean operation.</param>
         /// <param name="solver">The CSG solver to use.</param>
         /// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
-        public static Model Intersect(GameObject lhs, GameObject rhs, SolverType solver = SolverType.TriangleBased)
+        public static Model Intersect(GameObject lhs, GameObject rhs, SolverType solver = SolverType.Exact)
         {
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
@@ -165,7 +165,7 @@ namespace UnityEngine.ProBuilder.Csg
             List<Polygon> polygonsB = csg_model_b.ToPolygons();
 
             List<Polygon> result;
-            if (solver == SolverType.BSP)
+            if (solver == SolverType.Float)
             {
                 Node nodeA = new Node(polygonsA);
                 Node nodeB = new Node(polygonsB);

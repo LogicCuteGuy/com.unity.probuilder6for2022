@@ -20,8 +20,8 @@ namespace UnityEditor.ProBuilder
 
         enum SolverType
         {
-            TriangleBased,
-            BSP
+            Exact,
+            Float
         }
 
         const int k_Padding = 6;
@@ -41,7 +41,7 @@ namespace UnityEditor.ProBuilder
         Texture2D backgroundTexture;
         Editor m_LeftPreviewEditor, m_RightPreviewEditor;
         BooleanOp operation = BooleanOp.Intersection;
-        SolverType solver = SolverType.TriangleBased;
+        SolverType solver = SolverType.Exact;
         bool mouseClickedSwapRect = false;
         Vector2Int screen = Vector2Int.zero;
         static readonly string k_ReverseArrowsIcon = ((char)8644).ToString();
@@ -166,9 +166,9 @@ namespace UnityEditor.ProBuilder
 
             if (GUILayout.Button("Apply"))
             {
-                var csSolver = solver == SolverType.TriangleBased
-                    ? CSG.SolverType.TriangleBased
-                    : CSG.SolverType.BSP;
+                var csSolver = solver == SolverType.Exact
+                    ? CSG.SolverType.Exact
+                    : CSG.SolverType.Float;
 
                 switch (operation)
                 {
@@ -327,7 +327,7 @@ namespace UnityEditor.ProBuilder
             Intersect
         }
 
-        static ActionResult MenuBooleanOperation(BooleanOperation operation, ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
+        static ActionResult MenuBooleanOperation(BooleanOperation operation, ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.Exact)
         {
             if (lhs == null || rhs == null)
                 return new ActionResult(ActionResult.Status.Failure, "Must Select 2 Objects");
@@ -371,7 +371,7 @@ namespace UnityEditor.ProBuilder
         /**
          * Union operation between two ProBuilder objects.
          */
-        public static ActionResult MenuUnion(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
+        public static ActionResult MenuUnion(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.Exact)
         {
             return MenuBooleanOperation(BooleanOperation.Union, lhs, rhs, solver);
         }
@@ -379,7 +379,7 @@ namespace UnityEditor.ProBuilder
         /**
          * Subtract boolean operation between two pb_Objects.
          */
-        public static ActionResult MenuSubtract(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
+        public static ActionResult MenuSubtract(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.Exact)
         {
             return MenuBooleanOperation(BooleanOperation.Subtract, lhs, rhs, solver);
         }
@@ -387,7 +387,7 @@ namespace UnityEditor.ProBuilder
         /**
          * Intersect boolean operation between two pb_Objects.
          */
-        public static ActionResult MenuIntersect(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
+        public static ActionResult MenuIntersect(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.Exact)
         {
             return MenuBooleanOperation(BooleanOperation.Intersect, lhs, rhs, solver);
         }
