@@ -180,16 +180,22 @@ namespace UnityEngine.ProBuilder.Csg
                 triB.V0.position - triB.V2.position
             };
 
-            // Test separating axis theorem
-            Vector3[] axes = new Vector3[7];
+            // Test separating axis theorem (13 axes: 3 face normals + 9 edge cross products)
+            Vector3[] axes = new Vector3[13];
             axes[0] = normalA;
             axes[1] = normalB;
+            axes[2] = Vector3.forward; // Third axis for robustness
 
             for (int i = 0; i < 3; i++)
-                axes[2 + i] = Vector3.Cross(edgesA[i], normalB);
+                axes[3 + i] = Vector3.Cross(edgesA[i], normalB);
 
             for (int i = 0; i < 3; i++)
-                axes[5 + i] = Vector3.Cross(edgesB[i], normalA);
+                axes[6 + i] = Vector3.Cross(edgesB[i], normalA);
+
+            // Edge-edge cross products (9 axes)
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    axes[9 + i * 3 + j] = Vector3.Cross(edgesA[i], edgesB[j]);
 
             foreach (var axis in axes)
             {

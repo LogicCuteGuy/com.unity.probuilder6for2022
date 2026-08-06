@@ -1,4 +1,3 @@
-#if PROBUILDER_EXPERIMENTAL_FEATURES
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.Csg;
@@ -8,6 +7,7 @@ namespace UnityEditor.ProBuilder
 {
     /// <summary>
     /// Editor window for accessing boolean functionality.
+    /// Uses a triangle-based boolean algorithm inspired by Blender's Mesh Arrangements.
     /// </summary>
     sealed class BooleanEditor : ConfigurableWindow
     {
@@ -39,10 +39,10 @@ namespace UnityEditor.ProBuilder
         Vector2Int screen = Vector2Int.zero;
         static readonly string k_ReverseArrowsIcon = ((char)8644).ToString();
 
-        [MenuItem("Tools/" + PreferenceKeys.pluginTitle + "/Experimental/Boolean (CSG) Tool", false, PreferenceKeys.menuMisc)]
+        [MenuItem("Tools/" + PreferenceKeys.pluginTitle + "/Boolean (CSG) Tool", false, PreferenceKeys.menuMisc)]
         public static void MenuOpenBooleanTool()
         {
-            GetWindow<BooleanEditor>(true, "Boolean (Experimental)", true).Show();
+            GetWindow<BooleanEditor>(true, "Boolean (CSG)", true).Show();
         }
 
         void OnEnable()
@@ -381,4 +381,3 @@ namespace UnityEditor.ProBuilder
         }
     }
 }
-#endif
