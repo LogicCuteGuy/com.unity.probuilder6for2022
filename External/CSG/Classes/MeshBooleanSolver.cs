@@ -180,38 +180,44 @@ namespace UnityEngine.ProBuilder.Csg
                 triB.V0.position - triB.V2.position
             };
 
-            // Test separating axis theorem (13 axes: 3 face normals + 9 edge cross products)
-            Vector3[] axes = new Vector3[13];
-            axes[0] = normalA;
-            axes[1] = normalB;
-            axes[2] = Vector3.forward; // Third axis for robustness
+            // Standard SAT axes for two triangles: 2 face normals + 9 edge-edge cross products = 11 axes
+            // Skip any axis with near-zero magnitude (parallel edges/faces)
+            // Test face normal of A
+            if (AxisSeparatesTriangles(normalA, triA, triB))
+                return false;
 
+            // Test face normal of B
+            if (AxisSeparatesTriangles(normalB, triA, triB))
+                return false;
+
+            // Test all 9 edge-edge cross product axes
             for (int i = 0; i < 3; i++)
-                axes[3 + i] = Vector3.Cross(edgesA[i], normalB);
-
-            for (int i = 0; i < 3; i++)
-                axes[6 + i] = Vector3.Cross(edgesB[i], normalA);
-
-            // Edge-edge cross products (9 axes)
-            for (int i = 0; i < 3; i++)
-                for (int j = 0; j < 3; j++)
-                    axes[9 + i * 3 + j] = Vector3.Cross(edgesA[i], edgesB[j]);
-
-            foreach (var axis in axes)
             {
-                if (axis.sqrMagnitude < k_Epsilon * k_Epsilon)
-                    continue;
-
-                float minA, maxA, minB, maxB;
-                ProjectTriangle(triA, axis, out minA, out maxA);
-                ProjectTriangle(triB, axis, out minB, out maxB);
-
-                if (maxA < minB - k_Epsilon || maxB < minA - k_Epsilon)
-                    return false;
+                for (int j = 0; j < 3; j++)
+                {
+                    Vector3 axis = Vector3.Cross(edgesA[i], edgesB[j]);
+                    if (axis.sqrMagnitude < k_Epsilon * k_Epsilon)
+                        continue;
+                    if (AxisSeparatesTriangles(axis, triA, triB))
+                        return false;
+                }
             }
 
-            // Triangles intersect - find the intersection line
+            // All axes tested - no separating axis found, triangles intersect
+            // Find the intersection line
             return ComputeIntersectionLine(triA, triB, out edgeStart, out edgeEnd);
+        }
+
+        /// <summary>
+        /// Projects both triangles onto the given axis and checks for separation.
+        /// Returns true if the triangles are separated along this axis.
+        /// </summary>
+        static bool AxisSeparatesTriangles(Vector3 axis, Triangle triA, Triangle triB)
+        {
+            float minA, maxA, minB, maxB;
+            ProjectTriangle(triA, axis, out minA, out maxA);
+            ProjectTriangle(triB, axis, out minB, out maxB);
+            return maxA < minB - k_Epsilon || maxB < minA - k_Epsilon;
         }
 
         static bool BoundingBoxesOverlap(Triangle triA, Triangle triB)
