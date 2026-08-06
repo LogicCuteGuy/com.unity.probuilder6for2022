@@ -18,6 +18,12 @@ namespace UnityEditor.ProBuilder
             Subtraction
         }
 
+        enum SolverType
+        {
+            TriangleBased,
+            BSP
+        }
+
         const int k_Padding = 6;
         const int k_PreviewInset = 2;
 
@@ -35,6 +41,7 @@ namespace UnityEditor.ProBuilder
         Texture2D backgroundTexture;
         Editor m_LeftPreviewEditor, m_RightPreviewEditor;
         BooleanOp operation = BooleanOp.Intersection;
+        SolverType solver = SolverType.TriangleBased;
         bool mouseClickedSwapRect = false;
         Vector2Int screen = Vector2Int.zero;
         static readonly string k_ReverseArrowsIcon = ((char)8644).ToString();
@@ -155,21 +162,26 @@ namespace UnityEditor.ProBuilder
             GUI.backgroundColor = Color.white;
 
             operation = (BooleanOp) EditorGUILayout.EnumPopup("Operation", operation);
+            solver = (SolverType) EditorGUILayout.EnumPopup("Solver", solver);
 
             if (GUILayout.Button("Apply"))
             {
+                var csSolver = solver == SolverType.TriangleBased
+                    ? CSG.SolverType.TriangleBased
+                    : CSG.SolverType.BSP;
+
                 switch (operation)
                 {
                     case BooleanOp.Union:
-                        MenuUnion(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>());
+                        MenuUnion(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>(), csSolver);
                         break;
 
                     case BooleanOp.Intersection:
-                        MenuIntersect(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>());
+                        MenuIntersect(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>(), csSolver);
                         break;
 
                     case BooleanOp.Subtraction:
-                        MenuSubtract(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>());
+                        MenuSubtract(m_LeftGameObject.GetComponent<ProBuilderMesh>(), m_RightGameObject.GetComponent<ProBuilderMesh>(), csSolver);
                         break;
                 }
             }
@@ -315,7 +327,7 @@ namespace UnityEditor.ProBuilder
             Intersect
         }
 
-        static ActionResult MenuBooleanOperation(BooleanOperation operation, ProBuilderMesh lhs, ProBuilderMesh rhs)
+        static ActionResult MenuBooleanOperation(BooleanOperation operation, ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
         {
             if (lhs == null || rhs == null)
                 return new ActionResult(ActionResult.Status.Failure, "Must Select 2 Objects");
@@ -331,15 +343,15 @@ namespace UnityEditor.ProBuilder
             switch (operation)
             {
                 case BooleanOperation.Union:
-                    result = CSG.Union(lhs.gameObject, rhs.gameObject);
+                    result = CSG.Union(lhs.gameObject, rhs.gameObject, solver);
                     break;
 
                 case BooleanOperation.Subtract:
-                    result = CSG.Subtract(lhs.gameObject, rhs.gameObject);
+                    result = CSG.Subtract(lhs.gameObject, rhs.gameObject, solver);
                     break;
 
                 default:
-                    result = CSG.Intersect(lhs.gameObject, rhs.gameObject);
+                    result = CSG.Intersect(lhs.gameObject, rhs.gameObject, solver);
                     break;
             }
 
@@ -359,25 +371,25 @@ namespace UnityEditor.ProBuilder
         /**
          * Union operation between two ProBuilder objects.
          */
-        public static ActionResult MenuUnion(ProBuilderMesh lhs, ProBuilderMesh rhs)
+        public static ActionResult MenuUnion(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
         {
-            return MenuBooleanOperation(BooleanOperation.Union, lhs, rhs);
+            return MenuBooleanOperation(BooleanOperation.Union, lhs, rhs, solver);
         }
 
         /**
          * Subtract boolean operation between two pb_Objects.
          */
-        public static ActionResult MenuSubtract(ProBuilderMesh lhs, ProBuilderMesh rhs)
+        public static ActionResult MenuSubtract(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
         {
-            return MenuBooleanOperation(BooleanOperation.Subtract, lhs, rhs);
+            return MenuBooleanOperation(BooleanOperation.Subtract, lhs, rhs, solver);
         }
 
         /**
          * Intersect boolean operation between two pb_Objects.
          */
-        public static ActionResult MenuIntersect(ProBuilderMesh lhs, ProBuilderMesh rhs)
+        public static ActionResult MenuIntersect(ProBuilderMesh lhs, ProBuilderMesh rhs, CSG.SolverType solver = CSG.SolverType.TriangleBased)
         {
-            return MenuBooleanOperation(BooleanOperation.Intersect, lhs, rhs);
+            return MenuBooleanOperation(BooleanOperation.Intersect, lhs, rhs, solver);
         }
     }
 }
