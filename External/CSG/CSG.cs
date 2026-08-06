@@ -1,17 +1,21 @@
-// Original CSG.JS library by Evan Wallace (http://madebyevan.com), under the MIT license.
-// GitHub: https://github.com/evanw/csg.js/
+// Boolean (CSG) operations for Unity ProBuilder.
 //
-// C++ port by Tomasz Dabrowski (http://28byteslater.com), under the MIT license.
-// GitHub: https://github.com/dabroz/csgjs-cpp/
+// This implementation uses a triangle-based approach inspired by Blender's
+// Mesh Arrangements algorithm. Instead of BSP trees, it:
+// 1. Triangulates both input meshes
+// 2. Finds all triangle-triangle intersections
+// 3. Splits triangles at intersection lines
+// 4. Classifies each resulting triangle as inside/outside using ray casting
+// 5. Applies the boolean operation by keeping/removing triangles
 //
-// C# port by Karl Henkel (parabox.co), under MIT license.
+// This approach is more robust than classic BSP-based CSG, especially for:
+// - Coplanar faces
+// - Non-manifold geometry
+// - Floating point precision issues
 //
-// Constructive Solid Geometry (CSG) is a modeling technique that uses Boolean
-// operations like union and intersection to combine 3D solids. This library
-// implements CSG operations on meshes elegantly and concisely using BSP trees,
-// and is meant to serve as an easily understandable implementation of the
-// algorithm. All edge cases involving overlapping coplanar polygons in both
-// solids are correctly handled.
+// Based on research from:
+// - Blender's Mesh Arrangements for Solid Geometry
+// - Zhou, Grinspun, Zorin, Jacobson (2016)
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -24,6 +28,9 @@ namespace UnityEngine.ProBuilder.Csg
     /// <summary>
     /// Base class for CSG operations. Contains GameObject level methods for Subtraction, Intersection, and Union
     /// operations. The GameObjects passed to these functions will not be modified.
+    /// 
+    /// This implementation uses a triangle-based boolean algorithm inspired by Blender's
+    /// Mesh Arrangements approach, which is more robust than classic BSP tree methods.
     /// </summary>
     static class CSG
     {
@@ -38,7 +45,7 @@ namespace UnityEngine.ProBuilder.Csg
         static float s_Epsilon = k_DefaultEpsilon;
 
         /// <summary>
-        /// Tolerance used by <see cref="Plane.SplitPolygon"/> determine whether planes are coincident.
+        /// Tolerance used for epsilon-based comparisons in boolean operations.
         /// </summary>
         public static float epsilon
         {
@@ -85,12 +92,12 @@ namespace UnityEngine.ProBuilder.Csg
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
         
-            Node a = new Node(csg_model_a.ToPolygons());
-            Node b = new Node(csg_model_b.ToPolygons());
+            List<Polygon> polygonsA = csg_model_a.ToPolygons();
+            List<Polygon> polygonsB = csg_model_b.ToPolygons();
         
-            List<Polygon> polygons = Node.Union(a, b).AllPolygons();
+            List<Polygon> result = MeshBooleanSolver.PerformBoolean(polygonsA, polygonsB, BooleanOp.Union);
         
-            return new Model(polygons);
+            return new Model(result);
         }
         
         /// <summary>
@@ -104,12 +111,12 @@ namespace UnityEngine.ProBuilder.Csg
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
         
-            Node a = new Node(csg_model_a.ToPolygons());
-            Node b = new Node(csg_model_b.ToPolygons());
+            List<Polygon> polygonsA = csg_model_a.ToPolygons();
+            List<Polygon> polygonsB = csg_model_b.ToPolygons();
         
-            List<Polygon> polygons = Node.Subtract(a, b).AllPolygons();
+            List<Polygon> result = MeshBooleanSolver.PerformBoolean(polygonsA, polygonsB, BooleanOp.Subtraction);
         
-            return new Model(polygons);
+            return new Model(result);
         }
 
         /// <summary>
@@ -123,12 +130,12 @@ namespace UnityEngine.ProBuilder.Csg
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
 
-            Node a = new Node(csg_model_a.ToPolygons());
-            Node b = new Node(csg_model_b.ToPolygons());
+            List<Polygon> polygonsA = csg_model_a.ToPolygons();
+            List<Polygon> polygonsB = csg_model_b.ToPolygons();
 
-            List<Polygon> polygons = Node.Intersect(a, b).AllPolygons();
+            List<Polygon> result = MeshBooleanSolver.PerformBoolean(polygonsA, polygonsB, BooleanOp.Intersection);
 
-            return new Model(polygons);
+            return new Model(result);
         }
     }
 }
