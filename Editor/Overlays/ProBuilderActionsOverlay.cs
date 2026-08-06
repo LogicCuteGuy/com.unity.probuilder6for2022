@@ -125,7 +125,7 @@ namespace UnityEditor.ProBuilder
 
             style.flexGrow = 1f;
             m_Button.style.flexGrow = 1f;
-            m_Button.enabledSelf = m_Action.enabled;
+            m_Button.SetEnabled(m_Action.enabled);
             m_Button.tooltip = m_Action.menuTitle;
             m_Icon.style.display = DisplayStyle.Flex;
             m_Label.style.display = DisplayStyle.Flex;
@@ -149,7 +149,7 @@ namespace UnityEditor.ProBuilder
             var isGOContext = EditorToolManager.activeToolContext is GameObjectToolContext;
             hidden |= (m_Action.group == ToolbarGroup.Object) ? !isGOContext : isGOContext;
             m_Button.style.display = hidden ? DisplayStyle.None : DisplayStyle.Flex;
-            m_Button.enabledSelf = m_Action.enabled;
+            m_Button.SetEnabled(m_Action.enabled);
             m_Button.tooltip = m_Action.menuTitle;
 
             CleanUpStyles();
@@ -169,7 +169,7 @@ namespace UnityEditor.ProBuilder
         }
     }
 
-    [Overlay(typeof(SceneView), overlayId, k_DisplayName, minHeight = 150f, maxHeight = 500f, minWidth = 200f, maxWidth = 600f, defaultDisplay = false)]
+    [Overlay(typeof(SceneView), overlayId, k_DisplayName)]
     [Icon("Packages/com.unity.probuilder/Editor Default Resources/Icons/EditableMesh/EditMeshContext.png")]
     class ProBuilderActionsOverlay : Overlay, ICreateHorizontalToolbar, ICreateVerticalToolbar
     {
@@ -188,7 +188,7 @@ namespace UnityEditor.ProBuilder
         private List<MenuAction> m_AvailableActions = new ();
         List<ProBuilderActionButton> m_ActionButtons = new List<ProBuilderActionButton>();
 
-        GridView m_Grid;
+        UnityEngine.UIElements.ListView m_Grid;
         VisualElement m_ContentViewport;
         OverlayToolbar m_Toolbar;
 
@@ -219,7 +219,6 @@ namespace UnityEditor.ProBuilder
 
             layoutChanged += _ =>  UpdateContent();
             floatingChanged += _ =>  UpdateContent();
-            dockingCompleted += _ =>  UpdateContent();
         }
 
         private void OnAttachedToPanel(AttachToPanelEvent evt)
@@ -260,7 +259,10 @@ namespace UnityEditor.ProBuilder
         {
             var root = new VisualElement();
             root.name = "ProbuilderActions";
-            m_Grid = new GridView(m_AvailableActions, 0, 0, MakeItem, BindItem);
+            m_Grid = new UnityEngine.UIElements.ListView();
+            m_Grid.itemsSource = m_AvailableActions;
+            m_Grid.makeItem = MakeItem;
+            m_Grid.bindItem = BindItem;
             m_ContentViewport = m_Grid.Q("unity-content-viewport");
             root.Add(m_Grid);
 
@@ -339,8 +341,7 @@ namespace UnityEditor.ProBuilder
                 m_Grid.itemsSource = m_AvailableActions;
                 var fullWidth = float.IsFinite(m_ContentViewport.resolvedStyle.width) ?
                     Mathf.Clamp(m_ContentViewport.resolvedStyle.width - 10f, 0f, 180f) : 180f;
-                m_Grid.fixedItemWidth = s_CurrentMode == DisplayMode.Icon ? 40f : fullWidth;
-                m_Grid.Rebuild();
+                m_Grid.fixedItemHeight = 32f;
                 m_Grid.RefreshItems();
             }
         }
